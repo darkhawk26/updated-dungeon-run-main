@@ -22,7 +22,7 @@ public class PlayerController : MonoBehaviour
     public Vector2 PointerInput { get => pointerInput; set => pointerInput = value; }
     public Vector2 MovementInput { get => movementInput; set => movementInput = value; }
 
-
+    Vector2 mousePos;
    
     private void Start()
     {
@@ -45,6 +45,8 @@ public class PlayerController : MonoBehaviour
         speedY = Input.GetAxisRaw("Vertical") * moveSpeed;
 
         rb2d.velocity = new Vector2(speedX, speedY);
+
+       
 
         weaponParent.PointerPosition = pointerInput;
         AnimateCharacter();

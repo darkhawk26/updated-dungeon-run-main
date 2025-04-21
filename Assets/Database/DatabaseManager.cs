@@ -46,7 +46,6 @@ public class DatabaseManager : MonoBehaviour
 
                 InsertAbilityIfNotExists(cmd, "Fire Ring", "AOE", 5.0f, 20, 3.0f, 0, 0, 0, "Q");
                 InsertAbilityIfNotExists(cmd, "Wind Slash", "Projectile", 3.0f, 15, 5.0f, 10, 0, 0, "E");
-                InsertAbilityIfNotExists(cmd, "Stone Armor", "Buff", 10.0f, 0, 0, 0, 50, 1.0f, "F");
                 InsertAbilityIfNotExists(cmd, "Ultimate", "Explosion", 20.0f, 50, 5.0f, 0, 0, 0, "R");
 
                 

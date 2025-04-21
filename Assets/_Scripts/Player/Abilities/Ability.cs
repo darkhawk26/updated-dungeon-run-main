@@ -8,6 +8,9 @@ using static UnityEngine.EventSystems.EventTrigger;
 public class Ability : MonoBehaviour
 {
 
+    public Transform shotPoint;
+    
+
     public GameObject abilityEffectPrefab;
 
     [SerializeField]
@@ -115,7 +118,7 @@ public class Ability : MonoBehaviour
 
     void Update()
     {
-
+       
 
     }
     private void InvokeAbilityMethod(string abilityName)
@@ -186,27 +189,21 @@ public class Ability : MonoBehaviour
 
     private void ActivateWindSlash()
     {
-        
-
-        Debug.Log($"[WindSlash] Casting at speed {projectileSpeed} with range {abilityRange}");
-
         Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        Vector2 direction = (mousePos - transform.position).normalized;
+        Vector3 direction = mousePos - shotPoint.position;
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        shotPoint.rotation = Quaternion.Euler(0, 0, angle);
 
-        GameObject proj = Instantiate(
-            abilityEffectPrefab,
-            transform.position,
-            Quaternion.identity);
+        GameObject slash = Instantiate(abilityEffectPrefab, shotPoint.position, shotPoint.rotation);
+        Rigidbody2D rb = slash.GetComponent<Rigidbody2D>();
+        Projectile projectile = slash.GetComponent<Projectile>();
+        if (projectile != null)
+        {
+            projectile.Initialize(attackDamage, projectileSpeed, abilityRange, enemyLayer);
+        }
+        projectile.Initialize(attackDamage, projectileSpeed, abilityRange, enemyLayer);
+        rb.AddForce(shotPoint.right * projectileSpeed, ForceMode2D.Impulse);
 
-        
-
-        Projectile projectile = proj.GetComponent<Projectile>();
-       
-        projectile.speed = projectileSpeed;
-        projectile.damage = attackDamage;
-        projectile.range = abilityRange;
-        projectile.enemyLayer = enemyLayer;
-        projectile.SetDirection(direction);
     }
 
     private void ActivateStoneArmor()
@@ -228,4 +225,5 @@ public class Ability : MonoBehaviour
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, abilityRange);
     }
+   
 }

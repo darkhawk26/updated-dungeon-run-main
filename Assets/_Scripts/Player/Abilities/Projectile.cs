@@ -4,34 +4,32 @@ using UnityEngine;
 
 public class Projectile : MonoBehaviour
 {
-    public float speed;
-    public float damage;
-    public float range;
+    public float projectileSpeed;
+    public float attackDamage;
+    public float abilityRange;
     public LayerMask enemyLayer;
 
-    private Vector2 startPos;
-    private Vector2 direction;
+    private Vector2 startPosition;
 
+    private HashSet<Collider2D> hitEnemies = new HashSet<Collider2D>();
     private void Start()
     {
-        startPos = transform.position;
+        startPosition = transform.position;
+
     }
 
-    public void SetDirection(Vector2 dir)
-    {
-        direction = dir.normalized;
-        float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
-        transform.rotation = Quaternion.Euler(0f, 0f, angle); 
-    }
-
+    
     private void Update()
     {
-        transform.Translate(direction * speed * Time.deltaTime, Space.World);
-        Debug.DrawRay(transform.position, direction * 0.5f, Color.red, 0.1f); 
-
-        
-
-        if (Vector2.Distance(startPos, transform.position) >= range)
+        float distanceTravelled = Vector2.Distance(startPosition, transform.position);
+        if (distanceTravelled >= abilityRange)
+        {
+            Destroy(gameObject);
+        }
+    }
+    private void OnCollisionEnter2D(UnityEngine.Collision2D collision)
+    {
+        if (collision.gameObject.tag == "Obstacle")
         {
             Destroy(gameObject);
         }
@@ -41,14 +39,26 @@ public class Projectile : MonoBehaviour
     {
         Debug.Log($"[Projectile] Hit object: {other.name} on layer {LayerMask.LayerToName(other.gameObject.layer)}");
 
-        if (((1 << other.gameObject.layer) & enemyLayer) != 0)
+        if (other.gameObject.tag == "Obstacle")
         {
+            Destroy(gameObject);
+        }
+        if (((1 << other.gameObject.layer) & enemyLayer) != 0 && !hitEnemies.Contains(other))
+        {
+            hitEnemies.Add(other);
             Health health = other.GetComponent<Health>();
             if (health != null)
             {
-                health.TakeDamageFromAbilities(damage);
+                health.TakeDamageFromAbilities(attackDamage);
             }
-            Destroy(gameObject);
         }
+    }
+
+    public void Initialize(float damage, float speed, float range, LayerMask layer)
+    {
+        attackDamage = damage;
+        projectileSpeed = speed;
+        abilityRange = range;
+        enemyLayer = layer;
     }
 }
